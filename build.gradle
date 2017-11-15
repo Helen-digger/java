@@ -1,0 +1,42 @@
+buildscript {
+	ext {
+		springBootVersion = '1.5.8.RELEASE'
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+
+jar {
+	baseName = 'gs-accessing-data-mongodb'
+	group = 'com.example'
+	version = '0.0.1-SNAPSHOT'
+}
+
+sourceCompatibility = 1.8
+
+repositories {
+	mavenCentral()
+}
+
+
+dependencies {
+	compile('org.springframework.boot:spring-boot-starter-data-mongodb')
+	compile("org.springframework.boot:spring-boot-starter-web")
+	compile("com.fasterxml.jackson.core:jackson-databind")
+	compile group: "org.everit.json", name: "org.everit.json.schema", version: "1.1.1"
+	compile 'com.github.fge:json-schema-validator:2.2.6'
+	compile "com.googlecode.json-simple:json-simple:1.1"
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+	testCompile("org.springframework:spring-test")
+	testCompile("com.jayway.jsonpath:json-path")
+	testCompile("com.jayway.jsonpath:json-path-assert")
+}
