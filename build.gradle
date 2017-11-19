@@ -1,0 +1,92 @@
+buildscript {
+	repositories {
+		jcenter()
+		maven { url "https://plugins.gradle.org/m2/" }
+		maven { url 'https://repository.apache.org/snapshots' }
+	}
+	dependencies {
+		classpath "fi.jasoft.plugin:gradle-vaadin-plugin:${vaadinGradlePluginVersion}"
+		classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootPluginVersion}"
+	}
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'fi.jasoft.plugin.vaadin'
+apply plugin: 'org.springframework.boot'
+
+repositories {
+	mavenLocal()
+	jcenter()
+	maven { url = "http://maven.vaadin.com/vaadin-addons"}
+}
+
+jar {
+	baseName = 'gs-accessing-data-mongodb'
+	group = 'com.example'
+	version = '0.0.1-SNAPSHOT'
+}
+
+[compileJava, compileTestJava, javadoc]*.options*.encoding = "UTF-8"
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+idea {
+	module {
+		jdkName = '1.8'
+		downloadJavadoc = true
+		downloadSources = true
+	}
+}
+
+
+bootRun.dependsOn 'vaadinCompile', 'vaadinThemeCompile'
+
+vaadin {
+	version "${vaadinBomVersion}"
+}
+
+
+
+dependencyManagement {
+	imports {
+		mavenBom "com.vaadin:vaadin-bom:${vaadinBomVersion}"
+	}
+	dependencies {
+		dependency("com.vaadin:vaadin-spring-boot-starter:${vaadinSpringVersion}")
+		dependency("org.vaadin.spring.extensions:vaadin-spring-ext-boot:${vaadin4SpringVersion}")
+		dependency("org.vaadin.spring.extensions:vaadin-spring-ext-security:${vaadin4SpringVersion}")
+		dependency("org.vaadin.spring.addons:vaadin-spring-addon-sidebar:${vaadin4SpringVersion}")
+		dependency("org.hibernate:hibernate-validator:4.3.1.Final")
+		dependency("javax.validation:validation-api:1.0.0.GA")
+
+		dependency("org.vaadin.addons:geolocation:1.0</version>")
+	}
+}
+
+dependencies {
+	compile('org.springframework.boot:spring-boot-starter-data-mongodb')
+	compile 'com.vaadin:vaadin-spring-boot-starter'
+	compile 'org.vaadin.spring.extensions:vaadin-spring-ext-boot'
+	compile 'org.vaadin.spring.extensions:vaadin-spring-ext-security'
+	compile 'org.vaadin.spring.addons:vaadin-spring-addon-sidebar'
+	compile 'org.springframework.boot:spring-boot-starter-data-jpa'
+	compile("com.fasterxml.jackson.core:jackson-databind")
+	compile group: "org.everit.json", name: "org.everit.json.schema", version: "1.1.1"
+	compile 'com.github.fge:json-schema-validator:2.2.6'
+	compile "com.googlecode.json-simple:json-simple:1.1"
+	compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.9.1'
+	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.9.1'
+
+	runtime 'org.hsqldb:hsqldb'
+
+	testCompile 'org.springframework.boot:spring-boot-starter-test'
+	testCompile("org.springframework:spring-test")
+	testCompile("com.jayway.jsonpath:json-path")
+	testCompile("com.jayway.jsonpath:json-path-assert")
+}
+
+task wrapper(type: Wrapper) {
+	gradleVersion = '4.2.1'
+}
