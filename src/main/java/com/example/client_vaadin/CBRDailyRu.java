@@ -1,6 +1,5 @@
 package com.example.client_vaadin;
 
-import com.vaadin.ui.Label;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -10,11 +9,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import com.vaadin.server.VaadinRequest;
+
 
 
 public class CBRDailyRu {
@@ -23,8 +20,6 @@ public class CBRDailyRu {
     static final String URL_DailyCBR = "https://www.cbr-xml-daily.ru/daily_json.js";
 
     static public String showrate() {
-
-
 
         String result = "";
 

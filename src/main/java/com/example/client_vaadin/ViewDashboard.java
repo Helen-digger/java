@@ -1,21 +1,40 @@
 package com.example.client_vaadin;
+
+import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Page;
 import com.vaadin.server.Responsive;
+import com.vaadin.server.WebBrowser;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
-import java.time.LocalDateTime;
-import java.util.Iterator;
-import com.example.client_vaadin.CBRDailyRu;
-import org.json.JSONObject;
 
-@SpringComponent
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Iterator;
+
+class SelectCity {
+    private static final HashMap<String, String> citycode = new HashMap<>();
+
+    public static HashMap <String, String> getCity() {
+        citycode.put("524901", "Москва");
+        citycode.put("498817", "Санкт - Петербург");
+        citycode.put("1496747", "Новосибирск");
+
+        return citycode;
+    }
+}
+    @SpringComponent
+
 @SuppressWarnings("serial")
+
 
 public class ViewDashboard extends Panel {
 
     private final VerticalLayout layout;
     private Label titleLabel;
     private CssLayout dashboardPanels;
+    private Label dollar;
+
 
     public ViewDashboard() {
         addStyleName(ValoTheme.PANEL_BORDERLESS);
@@ -33,22 +52,6 @@ public class ViewDashboard extends Panel {
         layout.addComponent(buildInformashion());
 
     }
-
-   /* private Component buildSparklines() {
-
-        HorizontalLayout sparks = new HorizontalLayout();
-        sparks.addStyleName("sparks");
-        Responsive.makeResponsive(sparks);
-        sparks.setSpacing(false);
-        sparks.setMargin(false);
-        sparks.setSizeFull();
-
-        sparks.addComponent(buildweather());
-        sparks.addComponent(buildCurrency());
-        sparks.addComponent(buildVisitation());
-
-        return sparks;
-    }*/
 
     private Component buildContent() {
         dashboardPanels = new CssLayout();
@@ -79,16 +82,25 @@ public class ViewDashboard extends Panel {
         return header;
     }
 
-    private Component buildInformashion() {
-        HorizontalLayout inform = new HorizontalLayout();
+        /**
+         *
+         */
 
+        private Component buildInformashion() {
+
+        HorizontalLayout inform = new HorizontalLayout();
         DateTimeField date = new DateTimeField();
-        date.setValue(LocalDateTime.now());
+            date.setValue(LocalDateTime.now());
         date.addValueChangeListener(event -> Notification.show("Value changed:",
                 String.valueOf(event.getValue()),
                 Notification.Type.TRAY_NOTIFICATION));
-        Panel address = new Panel("IP address:");
+
+        final WebBrowser webBrowser = Page.getCurrent().getWebBrowser();
+        Panel address = new Panel("IP address:" + webBrowser.getAddress() );
+        Panel location = new Panel("Location" + webBrowser.getLocale().getDisplayName());
+
         inform.addComponent(address);
+        inform.addComponent(location);
         inform.addComponent(date);
 
         return inform;
@@ -98,16 +110,40 @@ public class ViewDashboard extends Panel {
 
     public Component buildweather() {
 
+
+
         VerticalLayout weatherlayuot = new VerticalLayout();
+
         Label weather = new Label("Погода");
+
         weather.setStyleName(ValoTheme.LABEL_H2);
+        //HashMap <String, String> CityCode = SelectCity.getCity();
         ComboBox weatherbox = new ComboBox();
-        weatherbox.setPlaceholder("No city selected");
-        weatherbox.setItems("Москва","Санкт - Петербург","Новосибирск");
+
+        //BeanItemContainer<SelectCity> CityCode= new BeanItemContainer(SelectCity.class, citycode);
+        //for(Map.Entry<String,String> e :CityCode.entrySet()){
+
+       //     weatherbox.addItem(e.getKey());
+       //     weatherbox.setValue(e.getValue());
+       // }
+       // weatherbox.setPlaceholder("No city selected");
+       // weatherbox.setItems("Москва","Санкт - Петербург","Новосибирск");
         weatherbox.setEmptySelectionAllowed(false);
+      //  weatherbox.setInvalidAllowed(false);
+
+
+        Label LabelToday = new Label();
+        Label LabelTommorow = new Label();
+
         Button add = new Button("Обновить");
-        Label label_today = new Label();
-        Label label_tommorow = new Label();
+        add.setIcon(FontAwesome.REFRESH);
+        add.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+
+            }
+        });
+
         weatherlayuot.addComponents(weather,weatherbox,add);
         weatherlayuot.setComponentAlignment(weather, Alignment.MIDDLE_LEFT);
         weatherlayuot.setComponentAlignment(weatherbox, Alignment.MIDDLE_LEFT);
@@ -123,8 +159,17 @@ public class ViewDashboard extends Panel {
         Label currency  = new Label("Валюта");
         CBRDailyRu WriteCBR = new CBRDailyRu();
         currency.setStyleName(ValoTheme.LABEL_H2);
-        Label dollar = new Label("" + WriteCBR.showrate());
+        dollar = new Label("" + WriteCBR.showrate());
         Button add = new Button("Обновить");
+
+        add.setIcon(FontAwesome.REFRESH);
+        add.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                dollar.setValue("" + WriteCBR.showrate());
+            }
+        });
+
         currencylayuot.addComponents(currency,dollar,add);
 
         return currencylayuot;

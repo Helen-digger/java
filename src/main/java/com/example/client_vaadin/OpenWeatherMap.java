@@ -1,5 +1,4 @@
 package com.example.client_vaadin;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,14 +12,17 @@ import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 public class OpenWeatherMap {
 
-    static final String URL_OpenWeatherMap_weather_Novosibirsk =
-            //"http://api.openweathermap.org/data/2.5/weather?q=Novosibirsk&APPID=79821d5373e0171e1b927d5e09e78578";
-"http://api.openweathermap.org/data/2.5/group?id=524901,1496747,498817&units=metric&APPID=79821d5373e0171e1b927d5e09e78578";
 
-    public static void main(String[] args) {
+
+
+
+    static final String URL_OpenWeatherMap_weather_Novosibirsk =
+            "http://api.openweathermap.org/data/2.5/weather?q=Novosibirsk&APPID=79821d5373e0171e1b927d5e09e78578";
+           // "http://api.openweathermap.org/data/2.5/group?id=524901,1496747,498817&units=metric&APPID=79821d5373e0171e1b927d5e09e78578";
+
+    public static void Weather(String[] args) {
 
         String result = "";
 
@@ -58,7 +60,6 @@ public class OpenWeatherMap {
             Logger.getLogger(OpenWeatherMap.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
     static private String ParseResult(String json) throws JSONException {
 
         String parsedResult = "";
