@@ -1,16 +1,12 @@
 package com.example.client_vaadin;
 
-import com.vaadin.server.FontAwesome;
-import com.vaadin.server.Page;
-import com.vaadin.server.Responsive;
-import com.vaadin.server.WebBrowser;
+import com.vaadin.server.*;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
+
 
 class SelectCity {
     private static final HashMap<String, String> citycode = new HashMap<>();
@@ -23,7 +19,8 @@ class SelectCity {
         return citycode;
     }
 }
-    @SpringComponent
+
+@SpringComponent
 
 @SuppressWarnings("serial")
 
@@ -34,6 +31,7 @@ public class ViewDashboard extends Panel {
     private Label titleLabel;
     private CssLayout dashboardPanels;
     private Label dollar;
+    private Label RemouteAddr;
 
 
     public ViewDashboard() {
@@ -81,60 +79,75 @@ public class ViewDashboard extends Panel {
 
         return header;
     }
-
-        /**
-         *
-         */
-
         private Component buildInformashion() {
 
         HorizontalLayout inform = new HorizontalLayout();
-        DateTimeField date = new DateTimeField();
-            date.setValue(LocalDateTime.now());
-        date.addValueChangeListener(event -> Notification.show("Value changed:",
-                String.valueOf(event.getValue()),
-                Notification.Type.TRAY_NOTIFICATION));
 
-        final WebBrowser webBrowser = Page.getCurrent().getWebBrowser();
-        Panel address = new Panel("IP address:" + webBrowser.getAddress() );
-        Panel location = new Panel("Location" + webBrowser.getLocale().getDisplayName());
+       // DateTimeField date = new DateTimeField();
+            Date date1 = new Date();
+       // date.addValueChangeListener(event -> Notification.show("Value changed:",
+        //        String.valueOf(event.getValue()),
+         //       Notification.Type.TRAY_NOTIFICATION));
+//        Page page = UI.getCurrent().getPage();
 
-        inform.addComponent(address);
-        inform.addComponent(location);
-        inform.addComponent(date);
+       //final WebBrowser webBrowser = Page.getCurrent().getWebBrowser();
+           // final WebBrowser webBrowser = page.getWebBrowser();
+       // Panel address = new Panel("IP address:" + webBrowser.getAddress() );
+        //Panel location = new Panel("Location" + webBrowser.getLocale().getDisplayName());
 
-        return inform;
+       // inform.addComponent(address);
+        //inform.addComponent(location);
+
+     //  ClientAddressServlet clientAddress = new ClientAddressServlet();
+
+       //RemouteAddr = new Label("IP address" + clientAddress.doPost());
+       Label date = new Label("Время:" +date1.getHours()+":"+date1.getMinutes()+":"+date1.getSeconds());
+       inform.addComponent(date);
+       return inform;
     }
 
 
 
     public Component buildweather() {
 
-
-
         VerticalLayout weatherlayuot = new VerticalLayout();
 
         Label weather = new Label("Погода");
+        OpenWeatherMap openWeatherMap = new OpenWeatherMap();
 
         weather.setStyleName(ValoTheme.LABEL_H2);
-        //HashMap <String, String> CityCode = SelectCity.getCity();
+        HashMap <String, String> CityCode = SelectCity.getCity();
         ComboBox weatherbox = new ComboBox();
 
-        //BeanItemContainer<SelectCity> CityCode= new BeanItemContainer(SelectCity.class, citycode);
-        //for(Map.Entry<String,String> e :CityCode.entrySet()){
+        List<Object> list = new ArrayList<>();
+        for(Map.Entry<String,String> e :CityCode.entrySet()){
+            list.add(e.getValue());
+        }
+        weatherbox.setItems(list);
 
-       //     weatherbox.addItem(e.getKey());
-       //     weatherbox.setValue(e.getValue());
-       // }
-       // weatherbox.setPlaceholder("No city selected");
-       // weatherbox.setItems("Москва","Санкт - Петербург","Новосибирск");
+        weatherbox.setPlaceholder("No city selected");
         weatherbox.setEmptySelectionAllowed(false);
-      //  weatherbox.setInvalidAllowed(false);
+        //weatherbox.addValueChangeListener(event -> weatherbox.getValue());
+        weatherbox.addValueChangeListener(event -> {
 
+            String keycity = "";
+            for (String key : CityCode.keySet()) {
+                if (CityCode.get(key).equals(event.getValue())) {
+                    System.out.println(key);
+                    keycity=key;
+                }
+            }
+            Notification.show("Value changed:"+openWeatherMap.Weather(keycity),
+                    String.valueOf(event.getValue()),
+                    Notification.Type.TRAY_NOTIFICATION);
+            weatherbox.getValue();
+            Label label=new Label(""+openWeatherMap.Weather(keycity));
+
+        });
 
         Label LabelToday = new Label();
         Label LabelTommorow = new Label();
-
+        weatherlayuot.addComponent(weatherbox);
         Button add = new Button("Обновить");
         add.setIcon(FontAwesome.REFRESH);
         add.addClickListener(new Button.ClickListener() {
@@ -160,14 +173,13 @@ public class ViewDashboard extends Panel {
         CBRDailyRu WriteCBR = new CBRDailyRu();
         currency.setStyleName(ValoTheme.LABEL_H2);
         dollar = new Label("" + WriteCBR.showrate());
+        UI ui = getUI();
+
         Button add = new Button("Обновить");
 
         add.setIcon(FontAwesome.REFRESH);
-        add.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                dollar.setValue("" + WriteCBR.showrate());
-            }
+        add.addClickListener(event -> {
+            currencylayuot.addComponent(new Label(WriteCBR.showrate()));
         });
 
         currencylayuot.addComponents(currency,dollar,add);

@@ -1,15 +1,16 @@
 package com.example.client_vaadin;
 
+import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinResponse;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class ClientAddressServlet extends HttpServlet {
-    protected String doPost(HttpServletRequest request)
+    public String doPost(VaadinRequest request)
             throws ServletException, IOException {
-        HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+        VaadinRequest httpServletRequest = (VaadinRequest) request;
         //
         // Get client's IP address
         //
@@ -22,11 +23,12 @@ public class ClientAddressServlet extends HttpServlet {
 
         //response.setContentType("text/plain");
         //PrintWriter out = response.getWriter();
+        System.out.println(clintHost);
      return clientIP;
     }
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    protected void doGet(VaadinRequest request, VaadinResponse response)
             throws ServletException, IOException {
-        doPost(request, response);
+        doPost(request);
     }
 }

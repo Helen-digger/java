@@ -14,20 +14,18 @@ import java.util.logging.Logger;
 
 public class OpenWeatherMap {
 
-
-
-
-
-    static final String URL_OpenWeatherMap_weather_Novosibirsk =
-            "http://api.openweathermap.org/data/2.5/weather?q=Novosibirsk&APPID=79821d5373e0171e1b927d5e09e78578";
+    static final String URL_OpenWeatherMap_weather = "http://api.openweathermap.org/data/2.5/weather?id=";
+            //"http://api.openweathermap.org/data/2.5/weather?q=Novosibirsk&APPID=79821d5373e0171e1b927d5e09e78578";
            // "http://api.openweathermap.org/data/2.5/group?id=524901,1496747,498817&units=metric&APPID=79821d5373e0171e1b927d5e09e78578";
+    //static public String URL_OpenWeatherMap_code = "";
+    static final String URL_OpenWeatherMap_ID = "&APPID=79821d5373e0171e1b927d5e09e78578";
 
-    public static void Weather(String[] args) {
+    public static String Weather(String URL_OpenWeatherMap_code) {
 
         String result = "";
 
         try {
-            URL url_weather = new URL(URL_OpenWeatherMap_weather_Novosibirsk);
+            URL url_weather = new URL(URL_OpenWeatherMap_weather+URL_OpenWeatherMap_code+URL_OpenWeatherMap_ID);
 
             HttpURLConnection httpURLConnection = (HttpURLConnection) url_weather.openConnection();
 
@@ -46,7 +44,7 @@ public class OpenWeatherMap {
 
                 String weatherResult = ParseResult(result);
 
-                System.out.println(weatherResult);
+                return ParseResult(result);
 
             } else {
                 System.out.println("Error in httpURLConnection.getResponseCode()!!!");
@@ -59,6 +57,7 @@ public class OpenWeatherMap {
         } catch (JSONException ex) {
             Logger.getLogger(OpenWeatherMap.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return "ERRROR!!!";
     }
     static private String ParseResult(String json) throws JSONException {
 
@@ -68,7 +67,7 @@ public class OpenWeatherMap {
 
         parsedResult += "Number of object = " + jsonObject.length() + "\n\n";
 
-        JSONObject jsonObject_list = jsonObject.getJSONObject("list");
+        //JSONObject jsonObject_list = jsonObject.getJSONObject("list");
 
 
         //"coord"
