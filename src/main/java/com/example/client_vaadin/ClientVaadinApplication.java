@@ -1,5 +1,6 @@
 package com.example.client_vaadin;
 
+import com.vaadin.annotations.Theme;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

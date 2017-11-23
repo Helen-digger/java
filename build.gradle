@@ -5,16 +5,20 @@ buildscript {
 		maven { url 'https://repository.apache.org/snapshots' }
 	}
 	dependencies {
-		classpath "fi.jasoft.plugin:gradle-vaadin-plugin:${vaadinGradlePluginVersion}"
+		//classpath "fi.jasoft.plugin:gradle-vaadin-plugin:${vaadinGradlePluginVersion}"
 		classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootPluginVersion}"
+		//classpath "https://plugins.gradle.org/m2/"
 	}
 }
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
-apply plugin: 'fi.jasoft.plugin.vaadin'
+//apply plugin: 'fi.jasoft.plugin.vaadin'
 apply plugin: 'org.springframework.boot'
+//apply plugin: "io.freefair.gradle:jsass-gradle-plugin:0.6.0"
+
+
 
 repositories {
 	mavenLocal()
@@ -41,11 +45,12 @@ idea {
 }
 
 
-bootRun.dependsOn 'vaadinCompile', 'vaadinThemeCompile'
 
-vaadin {
-	version "${vaadinBomVersion}"
-}
+//bootRun.dependsOn 'vaadinCompile', 'vaadinThemeCompile'
+
+//vaadin {
+//	version "${vaadinBomVersion}"
+//}
 
 
 
@@ -61,7 +66,6 @@ dependencyManagement {
 		dependency("org.hibernate:hibernate-validator:4.3.1.Final")
 		dependency("javax.validation:validation-api:1.0.0.GA")
 
-		dependency("org.vaadin.addons:geolocation:1.0</version>")
 	}
 }
 
@@ -82,14 +86,29 @@ dependencies {
 	compile 'org.springframework.boot:spring-boot-starter-tomcat:1.1.8.RELEASE'
 	compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.9.1'
 	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.9.1'
-
+	//compile group: 'com.vaadin', name: 'vaadin-push', version: '7.3.1'
+	//compile("com.vaadin:vaadin-push:7.6.6")
+	compile group: 'com.vaadin', name: 'vaadin-sass-compiler', version: '0.9.10'
 	runtime 'org.hsqldb:hsqldb'
 
 	testCompile 'org.springframework.boot:spring-boot-starter-test'
 	testCompile("org.springframework:spring-test")
 	testCompile("com.jayway.jsonpath:json-path")
 	testCompile("com.jayway.jsonpath:json-path-assert")
+
 }
+
+
+//vaadinThemeCompile {
+//	compiler 'vaadin'
+//	themesDirectory 'src/main/webapp/VAADIN/themes/dashboard'
+//	compress true
+//}
+//vaadinTestbench {
+//	enabled false
+//	version '3.+'
+//	runApplication true
+//}
 
 task wrapper(type: Wrapper) {
 	gradleVersion = '4.2.1'

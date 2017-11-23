@@ -1,17 +1,25 @@
 package com.example.client_vaadin;
 
+import com.vaadin.annotations.Theme;
+import com.vaadin.data.HasValue;
+import com.vaadin.navigator.View;
+import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.*;
+import com.vaadin.shared.ui.ContentMode;
+import com.vaadin.shared.ui.Orientation;
+import com.vaadin.shared.ui.slider.SliderOrientation;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 
 class SelectCity {
     private static final HashMap<String, String> citycode = new HashMap<>();
 
-    public static HashMap <String, String> getCity() {
+    public static HashMap<String, String> getCity() {
         citycode.put("524901", "Москва");
         citycode.put("498817", "Санкт - Петербург");
         citycode.put("1496747", "Новосибирск");
@@ -25,7 +33,7 @@ class SelectCity {
 @SuppressWarnings("serial")
 
 
-public class ViewDashboard extends Panel {
+public class ViewDashboard extends Panel implements View {
 
     private final VerticalLayout layout;
     private Label titleLabel;
@@ -41,10 +49,13 @@ public class ViewDashboard extends Panel {
         layout.setSizeFull();
         layout.setSpacing(false);
         setContent(layout);
+        layout.addStyleName("dashboard-view");
         Responsive.makeResponsive(layout);
         layout.addComponent(buildHeader());
 
         Component content = buildContent();
+
+
         layout.addComponent(content);
         layout.setExpandRatio(content, 1);
         layout.addComponent(buildInformashion());
@@ -54,13 +65,14 @@ public class ViewDashboard extends Panel {
     private Component buildContent() {
         dashboardPanels = new CssLayout();
         dashboardPanels.addStyleName("dashboard-panels");
+
         dashboardPanels.setWidth("100%");
         Responsive.makeResponsive(dashboardPanels);
 
         dashboardPanels.addComponent(buildweather());
         dashboardPanels.addComponent(buildCurrency());
         dashboardPanels.addComponent(buildVisitation());
-
+        dashboardPanels.setStyleName("dashboard-panels");
         return dashboardPanels;
     }
 
@@ -79,33 +91,31 @@ public class ViewDashboard extends Panel {
 
         return header;
     }
-        private Component buildInformashion() {
+
+    private Component buildInformashion() {
 
         HorizontalLayout inform = new HorizontalLayout();
 
-       // DateTimeField date = new DateTimeField();
-            Date date1 = new Date();
-       // date.addValueChangeListener(event -> Notification.show("Value changed:",
-        //        String.valueOf(event.getValue()),
-         //       Notification.Type.TRAY_NOTIFICATION));
+        DateTimeField date = new DateTimeField();
+        date.setValue(LocalDateTime.now());
+
 //        Page page = UI.getCurrent().getPage();
 
-       //final WebBrowser webBrowser = Page.getCurrent().getWebBrowser();
-           // final WebBrowser webBrowser = page.getWebBrowser();
-       // Panel address = new Panel("IP address:" + webBrowser.getAddress() );
+        //final WebBrowser webBrowser = Page.getCurrent().getWebBrowser();
+        // final WebBrowser webBrowser = page.getWebBrowser();
+        // Panel address = new Panel("IP address:" + webBrowser.getAddress() );
         //Panel location = new Panel("Location" + webBrowser.getLocale().getDisplayName());
 
-       // inform.addComponent(address);
+        // inform.addComponent(address);
         //inform.addComponent(location);
 
-     //  ClientAddressServlet clientAddress = new ClientAddressServlet();
+        //  ClientAddressServlet clientAddress = new ClientAddressServlet();
 
-       //RemouteAddr = new Label("IP address" + clientAddress.doPost());
-       Label date = new Label("Время:" +date1.getHours()+":"+date1.getMinutes()+":"+date1.getSeconds());
-       inform.addComponent(date);
-       return inform;
+        //RemouteAddr = new Label("IP address" + clientAddress.doPost());
+
+        inform.addComponent(date);
+        return inform;
     }
-
 
 
     public Component buildweather() {
@@ -116,11 +126,11 @@ public class ViewDashboard extends Panel {
         OpenWeatherMap openWeatherMap = new OpenWeatherMap();
 
         weather.setStyleName(ValoTheme.LABEL_H2);
-        HashMap <String, String> CityCode = SelectCity.getCity();
+        HashMap<String, String> CityCode = SelectCity.getCity();
         ComboBox weatherbox = new ComboBox();
 
         List<Object> list = new ArrayList<>();
-        for(Map.Entry<String,String> e :CityCode.entrySet()){
+        for (Map.Entry<String, String> e : CityCode.entrySet()) {
             list.add(e.getValue());
         }
         weatherbox.setItems(list);
@@ -134,19 +144,18 @@ public class ViewDashboard extends Panel {
             for (String key : CityCode.keySet()) {
                 if (CityCode.get(key).equals(event.getValue())) {
                     System.out.println(key);
-                    keycity=key;
+                    keycity = key;
                 }
             }
-            Notification.show("Value changed:"+openWeatherMap.Weather(keycity),
+            Notification.show("" + openWeatherMap.Weather(keycity),
                     String.valueOf(event.getValue()),
                     Notification.Type.TRAY_NOTIFICATION);
             weatherbox.getValue();
-            Label label=new Label(""+openWeatherMap.Weather(keycity));
+            //Label label=new Label(""+openWeatherMap.Weather(keycity));
+            weatherlayuot.addComponent(new Label("" + openWeatherMap.Weather(keycity)));
 
         });
 
-        Label LabelToday = new Label();
-        Label LabelTommorow = new Label();
         weatherlayuot.addComponent(weatherbox);
         Button add = new Button("Обновить");
         add.setIcon(FontAwesome.REFRESH);
@@ -157,7 +166,7 @@ public class ViewDashboard extends Panel {
             }
         });
 
-        weatherlayuot.addComponents(weather,weatherbox,add);
+        weatherlayuot.addComponents(weather, weatherbox, add);
         weatherlayuot.setComponentAlignment(weather, Alignment.MIDDLE_LEFT);
         weatherlayuot.setComponentAlignment(weatherbox, Alignment.MIDDLE_LEFT);
         weatherlayuot.setComponentAlignment(add, Alignment.MIDDLE_LEFT);
@@ -167,32 +176,33 @@ public class ViewDashboard extends Panel {
     }
 
 
-    private Component buildCurrency(){
+    private Component buildCurrency() {
         VerticalLayout currencylayuot = new VerticalLayout();
-        Label currency  = new Label("Валюта");
+        Label currency = new Label("Валюта");
         CBRDailyRu WriteCBR = new CBRDailyRu();
         currency.setStyleName(ValoTheme.LABEL_H2);
         dollar = new Label("" + WriteCBR.showrate());
-        UI ui = getUI();
+
 
         Button add = new Button("Обновить");
 
         add.setIcon(FontAwesome.REFRESH);
         add.addClickListener(event -> {
-            currencylayuot.addComponent(new Label(WriteCBR.showrate()));
+            //currencylayuot.addComponent(new Label(WriteCBR.showrate()));
+
         });
 
-        currencylayuot.addComponents(currency,dollar,add);
+        currencylayuot.addComponents(currency, dollar, add);
 
         return currencylayuot;
     }
 
-    private Component buildVisitation(){
+    private Component buildVisitation() {
         VerticalLayout visitationlayuot = new VerticalLayout();
-        Label visitation  = new Label("Посещения");
+        Label visitation = new Label("Посещения");
         visitation.setStyleName(ValoTheme.LABEL_H2);
         Label quantity = new Label("Количество");
-        visitationlayuot.addComponents(visitation,quantity);
+        visitationlayuot.addComponents(visitation, quantity);
 
         return visitationlayuot;
     }
@@ -219,12 +229,12 @@ public class ViewDashboard extends Panel {
     }
 
     private void toggleMaximized(final Component panel, final boolean maximized) {
-        for (Iterator<Component> it = layout.iterator(); it.hasNext();) {
+        for (Iterator<Component> it = layout.iterator(); it.hasNext(); ) {
             it.next().setVisible(!maximized);
         }
         dashboardPanels.setVisible(true);
 
-        for (Iterator<Component> it = dashboardPanels.iterator(); it.hasNext();) {
+        for (Iterator<Component> it = dashboardPanels.iterator(); it.hasNext(); ) {
             Component c = it.next();
             c.setVisible(!maximized);
         }
@@ -235,6 +245,11 @@ public class ViewDashboard extends Panel {
         } else {
             panel.removeStyleName("max");
         }
+    }
+
+    @Override
+    public void enter(final ViewChangeListener.ViewChangeEvent event) {
+        layout.addComponent(new Label());
     }
 }
 

@@ -1,0 +1,8 @@
+@import "addons";
+@import "dashboard";
+
+.dashboard {
+  @include addons;
+  @include dashboard;
+
+}
