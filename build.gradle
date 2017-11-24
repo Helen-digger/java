@@ -16,13 +16,17 @@ apply plugin: 'eclipse'
 apply plugin: 'idea'
 //apply plugin: 'fi.jasoft.plugin.vaadin'
 apply plugin: 'org.springframework.boot'
+apply plugin: 'maven-publish'
+apply plugin: 'maven'
 //apply plugin: "io.freefair.gradle:jsass-gradle-plugin:0.6.0"
+//apply from: 'http://plugins.jasoft.fi/vaadin.plugin'
 
 
 
 repositories {
 	mavenLocal()
 	jcenter()
+	maven { url "http://repo1.maven.org/maven2" }
 	maven { url = "http://maven.vaadin.com/vaadin-addons"}
 }
 
@@ -86,9 +90,10 @@ dependencies {
 	compile 'org.springframework.boot:spring-boot-starter-tomcat:1.1.8.RELEASE'
 	compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.9.1'
 	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.9.1'
-	//compile group: 'com.vaadin', name: 'vaadin-push', version: '7.3.1'
-	//compile("com.vaadin:vaadin-push:7.6.6")
+
 	compile group: 'com.vaadin', name: 'vaadin-sass-compiler', version: '0.9.10'
+	//compile "com.vaadin:vaadin-themes:7.0.1}"
+	compile "com.vaadin:vaadin-theme-compiler:7.0.1"
 	runtime 'org.hsqldb:hsqldb'
 
 	testCompile 'org.springframework.boot:spring-boot-starter-test'
@@ -99,16 +104,7 @@ dependencies {
 }
 
 
-//vaadinThemeCompile {
-//	compiler 'vaadin'
-//	themesDirectory 'src/main/webapp/VAADIN/themes/dashboard'
-//	compress true
-//}
-//vaadinTestbench {
-//	enabled false
-//	version '3.+'
-//	runApplication true
-//}
+
 
 task wrapper(type: Wrapper) {
 	gradleVersion = '4.2.1'

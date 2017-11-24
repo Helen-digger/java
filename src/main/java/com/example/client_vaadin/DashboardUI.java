@@ -18,7 +18,7 @@ import javax.servlet.ServletException;
 import java.io.IOException;
 
 @Title("Dashboard")
-@Theme("dashboard")
+@Theme("valo")
 @SpringUI
 
 public class DashboardUI extends UI {
@@ -27,6 +27,7 @@ public class DashboardUI extends UI {
 
     @Autowired
     ViewDashboard viewDashboard;
+    private CounterRepository repository;
 
     @Override
     protected void init(VaadinRequest request) {
@@ -35,6 +36,7 @@ public class DashboardUI extends UI {
         setupLayuot();
         addHeader();
         //addForm();
+
         ClientAddressServlet clientAddressServlet = new ClientAddressServlet();
         try {
             Label ip = new Label("" + clientAddressServlet.doPost(request));
@@ -43,8 +45,14 @@ public class DashboardUI extends UI {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        setStyleName("dashboard");
 
+
+        Counter cnt  = repository.findByPage("all");
+        Integer counter = new Integer(cnt.value);
+        counter++;
+        cnt.value =  counter.toString();
+        repository.save(cnt);
+        //System.out.println(cnt);
 
     }
 
@@ -57,6 +65,7 @@ public class DashboardUI extends UI {
 
 
     }
+
 
 
     private void addHeader() {

@@ -9,6 +9,7 @@ import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.shared.ui.Orientation;
 import com.vaadin.shared.ui.slider.SliderOrientation;
 import com.vaadin.spring.annotation.SpringComponent;
+import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 
@@ -29,15 +30,15 @@ class SelectCity {
 }
 
 @SpringComponent
-
 @SuppressWarnings("serial")
+@UIScope
 
 
 public class ViewDashboard extends Panel implements View {
 
     private final VerticalLayout layout;
     private Label titleLabel;
-    private CssLayout dashboardPanels;
+    private HorizontalLayout dashboardPanels;
     private Label dollar;
     private Label RemouteAddr;
 
@@ -63,16 +64,21 @@ public class ViewDashboard extends Panel implements View {
     }
 
     private Component buildContent() {
-        dashboardPanels = new CssLayout();
+        dashboardPanels = new HorizontalLayout();
         dashboardPanels.addStyleName("dashboard-panels");
-
+        dashboardPanels.setSpacing(false);
+        dashboardPanels.setMargin(false);
+        dashboardPanels.setSizeFull();
         dashboardPanels.setWidth("100%");
         Responsive.makeResponsive(dashboardPanels);
 
         dashboardPanels.addComponent(buildweather());
         dashboardPanels.addComponent(buildCurrency());
         dashboardPanels.addComponent(buildVisitation());
+
         dashboardPanels.setStyleName("dashboard-panels");
+
+
         return dashboardPanels;
     }
 
@@ -87,6 +93,8 @@ public class ViewDashboard extends Panel implements View {
         titleLabel.addStyleName(ValoTheme.LABEL_H1);
         titleLabel.addStyleName(ValoTheme.LABEL_NO_MARGIN);
         header.addComponent(titleLabel);
+
+
 
 
         return header;
@@ -171,7 +179,7 @@ public class ViewDashboard extends Panel implements View {
         weatherlayuot.setComponentAlignment(weatherbox, Alignment.MIDDLE_LEFT);
         weatherlayuot.setComponentAlignment(add, Alignment.MIDDLE_LEFT);
         weatherlayuot.addStyleName(ValoTheme.PANEL_BORDERLESS);
-        weatherlayuot.setSizeFull();
+        //weatherlayuot.setSizeFull();
         return weatherlayuot;
     }
 
@@ -207,26 +215,7 @@ public class ViewDashboard extends Panel implements View {
         return visitationlayuot;
     }
 
-    private Component createContentWrapper(final Component content) {
-        final CssLayout slot = new CssLayout();
-        slot.setWidth("100%");
-        slot.addStyleName("dashboard-panel-slot");
 
-        CssLayout card = new CssLayout();
-        card.setWidth("100%");
-        card.addStyleName(ValoTheme.LAYOUT_CARD);
-
-        Label caption = new Label(content.getCaption());
-        caption.addStyleName(ValoTheme.LABEL_H4);
-        caption.addStyleName(ValoTheme.LABEL_COLORED);
-        caption.addStyleName(ValoTheme.LABEL_NO_MARGIN);
-        content.setCaption(null);
-
-        card.addComponent(content);
-        slot.addComponent(card);
-        return slot;
-
-    }
 
     private void toggleMaximized(final Component panel, final boolean maximized) {
         for (Iterator<Component> it = layout.iterator(); it.hasNext(); ) {

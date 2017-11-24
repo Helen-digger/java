@@ -1,5 +1,31 @@
 package com.example.client_vaadin;
 
-public class Counter {
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.io.Serializable;
+
+@Document(collection = Counter.COLLECTION_NAME)
+public class Counter implements Serializable{
+
+    public static final String COLLECTION_NAME = "counter";
+
+    @Id
+    private long id;
+
+    private String page;
+    public String value;
+
+    public Counter(String page, String value){
+        this.page = page;
+        this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "Counter[id=%s, page='%s', value='%s']",
+                id, page, value);
+    }
 
 }
