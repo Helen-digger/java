@@ -1,20 +1,22 @@
 package com.example.client_vaadin;
 
-import com.vaadin.annotations.Theme;
 import com.vaadin.data.HasValue;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.*;
-import com.vaadin.shared.ui.ContentMode;
-import com.vaadin.shared.ui.Orientation;
-import com.vaadin.shared.ui.slider.SliderOrientation;
+import com.vaadin.shared.Registration;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+
+import static com.vaadin.ui.Button.*;
 
 
 class SelectCity {
@@ -36,21 +38,24 @@ class SelectCity {
 
 public class ViewDashboard extends Panel implements View {
 
+    Logger logger;
+
     private final VerticalLayout layout;
     private Label titleLabel;
     private HorizontalLayout dashboardPanels;
     private Label dollar;
     private Label RemouteAddr;
-
+    public String keyc;
 
     public ViewDashboard() {
+        logger  = LogManager.getLogger();
+        logger.info("!!!!!!!!!!!!!!new dashboard created!!!!!!!!!!!!!!!!!!!");
         addStyleName(ValoTheme.PANEL_BORDERLESS);
         setSizeFull();
         layout = new VerticalLayout();
         layout.setSizeFull();
-        layout.setSpacing(false);
+        layout.setSpacing(true);
         setContent(layout);
-        layout.addStyleName("dashboard-view");
         Responsive.makeResponsive(layout);
         layout.addComponent(buildHeader());
 
@@ -59,25 +64,21 @@ public class ViewDashboard extends Panel implements View {
 
         layout.addComponent(content);
         layout.setExpandRatio(content, 1);
-        layout.addComponent(buildInformashion());
 
+        layout.addComponent(buildInformashion());
     }
 
     private Component buildContent() {
         dashboardPanels = new HorizontalLayout();
-        dashboardPanels.addStyleName("dashboard-panels");
-        dashboardPanels.setSpacing(false);
+        dashboardPanels.addStyleName(ValoTheme.LAYOUT_HORIZONTAL_WRAPPING);
+        dashboardPanels.setSpacing(true);
         dashboardPanels.setMargin(false);
         dashboardPanels.setSizeFull();
-        dashboardPanels.setWidth("100%");
         Responsive.makeResponsive(dashboardPanels);
 
         dashboardPanels.addComponent(buildweather());
         dashboardPanels.addComponent(buildCurrency());
         dashboardPanels.addComponent(buildVisitation());
-
-        dashboardPanels.setStyleName("dashboard-panels");
-
 
         return dashboardPanels;
     }
@@ -85,43 +86,33 @@ public class ViewDashboard extends Panel implements View {
 
     private Component buildHeader() {
         HorizontalLayout header = new HorizontalLayout();
-        header.addStyleName("viewheader");
+        header.setSpacing(true);
+        header.setMargin(true);
 
         titleLabel = new Label("Dashboard");
-        //titleLabel.setId(TITLE_ID);
         titleLabel.setSizeUndefined();
         titleLabel.addStyleName(ValoTheme.LABEL_H1);
         titleLabel.addStyleName(ValoTheme.LABEL_NO_MARGIN);
         header.addComponent(titleLabel);
-
-
-
-
         return header;
     }
 
-    private Component buildInformashion() {
-
+    public Component buildInformashion() {
         HorizontalLayout inform = new HorizontalLayout();
+        inform.setSpacing(true);
+        LocalDateTime date = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        Event event = null;
+        String formatDateTime = date.format(formatter);
 
-        DateTimeField date = new DateTimeField();
-        date.setValue(LocalDateTime.now());
+        Label dateLabel = new Label(formatDateTime);
 
-//        Page page = UI.getCurrent().getPage();
 
-        //final WebBrowser webBrowser = Page.getCurrent().getWebBrowser();
-        // final WebBrowser webBrowser = page.getWebBrowser();
-        // Panel address = new Panel("IP address:" + webBrowser.getAddress() );
-        //Panel location = new Panel("Location" + webBrowser.getLocale().getDisplayName());
+        Panel address = new Panel("IP address:" + DashboardUI.ip);
+        Panel addressw = new Panel("IP address:" + DashboardUI.wip);
+        Panel geol = new Panel("IP address:" + DashboardUI.geo);
 
-        // inform.addComponent(address);
-        //inform.addComponent(location);
-
-        //  ClientAddressServlet clientAddress = new ClientAddressServlet();
-
-        //RemouteAddr = new Label("IP address" + clientAddress.doPost());
-
-        inform.addComponent(date);
+        inform.addComponents( dateLabel, address, addressw, geol);
         return inform;
     }
 
@@ -129,12 +120,15 @@ public class ViewDashboard extends Panel implements View {
     public Component buildweather() {
 
         VerticalLayout weatherlayuot = new VerticalLayout();
+        weatherlayuot.addStyleName(ValoTheme.LAYOUT_CARD);
+        weatherlayuot.setWidth("100%");
 
         Label weather = new Label("Погода");
-        OpenWeatherMap openWeatherMap = new OpenWeatherMap();
+        WeatherMap weatherMap = new WeatherMap();
 
         weather.setStyleName(ValoTheme.LABEL_H2);
         HashMap<String, String> CityCode = SelectCity.getCity();
+        Image image = new Image();
         ComboBox weatherbox = new ComboBox();
 
         List<Object> list = new ArrayList<>();
@@ -143,49 +137,56 @@ public class ViewDashboard extends Panel implements View {
         }
         weatherbox.setItems(list);
 
+        Label weath = new Label();
         weatherbox.setPlaceholder("No city selected");
         weatherbox.setEmptySelectionAllowed(false);
-        //weatherbox.addValueChangeListener(event -> weatherbox.getValue());
-        weatherbox.addValueChangeListener(event -> {
-
-            String keycity = "";
+        weatherbox.addValueChangeListener((HasValue.ValueChangeEvent event) -> {
             for (String key : CityCode.keySet()) {
                 if (CityCode.get(key).equals(event.getValue())) {
                     System.out.println(key);
-                    keycity = key;
+                    keyc = key;
                 }
             }
-            Notification.show("" + openWeatherMap.Weather(keycity),
+            Notification.show("" + weatherMap.getWeatherNow(keyc),
                     String.valueOf(event.getValue()),
                     Notification.Type.TRAY_NOTIFICATION);
             weatherbox.getValue();
-            //Label label=new Label(""+openWeatherMap.Weather(keycity));
-            weatherlayuot.addComponent(new Label("" + openWeatherMap.Weather(keycity)));
+            weath.setValue(String.valueOf(weatherMap.weather.now.temp));
+            image.setSource(new ExternalResource("http://openweathermap.org/img/w/" + weatherMap.weather.now.icon + ".png"));
 
         });
 
+
         weatherlayuot.addComponent(weatherbox);
+
         Button add = new Button("Обновить");
+        add.addStyleName(ValoTheme.BUTTON_SMALL);
         add.setIcon(FontAwesome.REFRESH);
-        add.addClickListener(new Button.ClickListener() {
+        add.addClickListener(new ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent event) {
+            public void buttonClick(final ClickEvent event) {
+                weath.setValue(String.valueOf(weatherMap.weather.now.temp));
+                image.setSource(new ExternalResource("http://openweathermap.org/img/w/" + weatherMap.weather.now.icon + ".png"));
 
             }
         });
 
-        weatherlayuot.addComponents(weather, weatherbox, add);
+
+        weatherlayuot.addComponents(weather, weatherbox, weath);
+        weatherlayuot.addComponents(image);
+        weatherlayuot.addComponent(add);
+
         weatherlayuot.setComponentAlignment(weather, Alignment.MIDDLE_LEFT);
         weatherlayuot.setComponentAlignment(weatherbox, Alignment.MIDDLE_LEFT);
         weatherlayuot.setComponentAlignment(add, Alignment.MIDDLE_LEFT);
-        weatherlayuot.addStyleName(ValoTheme.PANEL_BORDERLESS);
-        //weatherlayuot.setSizeFull();
         return weatherlayuot;
     }
 
 
     private Component buildCurrency() {
         VerticalLayout currencylayuot = new VerticalLayout();
+        currencylayuot.addStyleName(ValoTheme.LAYOUT_CARD);
+        currencylayuot.setWidth("100%");
         Label currency = new Label("Валюта");
         CBRDailyRu WriteCBR = new CBRDailyRu();
         currency.setStyleName(ValoTheme.LABEL_H2);
@@ -193,11 +194,12 @@ public class ViewDashboard extends Panel implements View {
 
 
         Button add = new Button("Обновить");
+        add.addStyleName(ValoTheme.BUTTON_SMALL);
 
         add.setIcon(FontAwesome.REFRESH);
         add.addClickListener(event -> {
-            //currencylayuot.addComponent(new Label(WriteCBR.showrate()));
-
+            dollar.setValue(WriteCBR.showrate());
+            // date.setValue(LocalDateTime.now());
         });
 
         currencylayuot.addComponents(currency, dollar, add);
@@ -207,6 +209,8 @@ public class ViewDashboard extends Panel implements View {
 
     private Component buildVisitation() {
         VerticalLayout visitationlayuot = new VerticalLayout();
+        visitationlayuot.addStyleName(ValoTheme.LAYOUT_CARD);
+        visitationlayuot.setWidth("100%");
         Label visitation = new Label("Посещения");
         visitation.setStyleName(ValoTheme.LABEL_H2);
         Label quantity = new Label("Количество");
@@ -216,29 +220,10 @@ public class ViewDashboard extends Panel implements View {
     }
 
 
-
-    private void toggleMaximized(final Component panel, final boolean maximized) {
-        for (Iterator<Component> it = layout.iterator(); it.hasNext(); ) {
-            it.next().setVisible(!maximized);
-        }
-        dashboardPanels.setVisible(true);
-
-        for (Iterator<Component> it = dashboardPanels.iterator(); it.hasNext(); ) {
-            Component c = it.next();
-            c.setVisible(!maximized);
-        }
-
-        if (maximized) {
-            panel.setVisible(true);
-            panel.addStyleName("max");
-        } else {
-            panel.removeStyleName("max");
-        }
-    }
-
     @Override
     public void enter(final ViewChangeListener.ViewChangeEvent event) {
         layout.addComponent(new Label());
     }
+
 }
 

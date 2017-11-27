@@ -1,8 +1,7 @@
-@import "addons";
+@import "addons.scss";
 @import "dashboard";
 
 .dashboard {
   @include addons;
   @include dashboard;
-
 }

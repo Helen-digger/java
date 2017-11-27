@@ -1,11 +1,7 @@
 
-@import "styles";
-
+@import "../valo/valo";
 
 @mixin dashboard{
   @include valo;
-  .v-button-caption {
-    color: red;
-  }
 
-}
+  }

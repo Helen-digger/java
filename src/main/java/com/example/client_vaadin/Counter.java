@@ -11,7 +11,7 @@ public class Counter implements Serializable{
     public static final String COLLECTION_NAME = "counter";
 
     @Id
-    private long id;
+    public String id;
 
     private String page;
     public String value;
