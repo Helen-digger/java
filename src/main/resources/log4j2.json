@@ -1,43 +1,32 @@
 {
-  "configuration" :   {
-    "name" :   "Default" ,
-    "properties" :   {
-      "property" :   [
-        {
-          "name" :   "log-path" ,
-          "value" :   "logs"
-        } ,
-        {
-          "name" :   "archive" ,
-          "value" :   "${log-path}/archive"
-        }
-      ]
-    } ,
-    "appenders" :   {
-      "Console" :   {
-        "name" :   "Console-Appender" ,
-        "target" :   "SYSTEM_OUT" ,
-        "PatternLayout" :   {
-          "pattern" :   "[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n"
-        }
-      } ,
-      "File" :   {
-        "name" :   "File-Appender" ,
-        "fileName" :   "${log-path}/logfile.log" ,
-        "PatternLayout" :   {
-          "pattern" :   "[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n"
+  "configuration": {
+    "name": "Default",
+    "appenders": {
+      "RollingFile": {
+        "name":"File",
+        "fileName":"logs/log.html",
+        "filePattern":"debag-backup-%d{MM-dd-yy-HH-mm-ss}-%i.html.gz",
+        "HTMLLayout": {
+          "charset":"UTF-8",
+          "title":"Dashboard s logs",
+          "locationInfo":"true"
+        },
+        "Policies": {
+          "SizeBasedTriggeringPolicy": {
+            "size":"10 MB"
+          }
+        },
+        "DefaultRolloverStrategy": {
+          "max":"10"
         }
       }
-    } ,
-    "loggers" :   {
-      "logger" :   {
-        "name" :   "guru.springframework.blog.log4j2json" ,
-        "level" :   "debug" ,
-        "appender-ref" :   [ { "ref" :   "File-Appender" ,   "level" : "error" } ]
-      } ,
-      "root" :   {
-        "level" :   "debug" ,
-        "appender-ref" :   { "ref" :   "Console-Appender" }
+    },
+    "loggers": {
+      "root": {
+        "level":"debug",
+        "appender-ref": {
+          "ref":"File"
+        }
       }
     }
   }

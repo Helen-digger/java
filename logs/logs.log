@@ -1,0 +1,5 @@
+2017-11-28 13:05:58.236 DEBUG [main] [com.example.client_vaadin.ClientVaadinApplication] [main] [com.example.client_vaadin.ClientVaadinApplication.main(ClientVaadinApplication.java:16)] - This is a debug message
+2017-11-28 13:05:58.238 INFO [main] [com.example.client_vaadin.ClientVaadinApplication] [main] [com.example.client_vaadin.ClientVaadinApplication.main(ClientVaadinApplication.java:17)] - This is an info message
+2017-11-28 13:05:58.238 WARN [main] [com.example.client_vaadin.ClientVaadinApplication] [main] [com.example.client_vaadin.ClientVaadinApplication.main(ClientVaadinApplication.java:18)] - This is a warn message
+2017-11-28 13:05:58.238 ERROR [main] [com.example.client_vaadin.ClientVaadinApplication] [main] [com.example.client_vaadin.ClientVaadinApplication.main(ClientVaadinApplication.java:19)] - This is an error message
+2017-11-28 13:05:58.239 FATAL [main] [com.example.client_vaadin.ClientVaadinApplication] [main] [com.example.client_vaadin.ClientVaadinApplication.main(ClientVaadinApplication.java:20)] - This is a fatal message

@@ -8,9 +8,10 @@ import java.io.IOException;
 import java.io.*;
 import java.util.Locale;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.text.*;
+
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,6 +36,7 @@ public class WeatherMap {
     static final String URL_preambul_days = "http://api.openweathermap.org/data/2.5/forecast?id=";
     static final String APPID = "&APPID=79821d5373e0171e1b927d5e09e78578&units=metric";
     public Forecast weather = new Forecast();
+    static org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
     public String getWeatherNow(String city_code) {
         String forecast_json = "";
@@ -61,11 +63,11 @@ public class WeatherMap {
             }
 
         } catch (MalformedURLException ex) {
-            Logger.getLogger(WeatherMap.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.ERROR, (String) null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(WeatherMap.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.ERROR, (String) null, ex);
         } catch (JSONException ex) {
-            Logger.getLogger(WeatherMap.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.ERROR, (String) null, ex);
         }
         return "ERRROR!!!";
     }
@@ -95,11 +97,11 @@ public class WeatherMap {
             }
 
         } catch (MalformedURLException ex) {
-            Logger.getLogger(WeatherMap.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.ERROR, (String) null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(WeatherMap.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.ERROR, (String) null, ex);
         } catch (JSONException ex) {
-            Logger.getLogger(WeatherMap.class.getName()).log(Level.SEVERE, null, ex);
+            logger.log(Level.ERROR, (String) null, ex);
         }
         return "ERRROR!!!";
     }
