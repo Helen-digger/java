@@ -1,4 +1,4 @@
-package com.example.client_vaadin;
+package com.vaadin.dashboard;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 

@@ -1,13 +1,16 @@
-package com.example.client_vaadin;
+package com.vaadin.dashboard;
 
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
+import org.apache.logging.log4j.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import java.io.IOException;
 
 public class ClientAddressServlet extends HttpServlet {
+    Logger logger;
+
     public String doPost(VaadinRequest request)
             throws ServletException, IOException {
         VaadinRequest httpServletRequest = (VaadinRequest) request;
@@ -23,8 +26,7 @@ public class ClientAddressServlet extends HttpServlet {
 
         //response.setContentType("text/plain");
         //PrintWriter out = response.getWriter();
-        System.out.println(clintHost);
-     return clientIP;
+        return clientIP;
     }
 
     protected void doGet(VaadinRequest request, VaadinResponse response)

@@ -1,10 +1,9 @@
-package com.example.client_vaadin;
+package com.vaadin.dashboard;
 
 import com.vaadin.data.HasValue;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.*;
-import com.vaadin.shared.Registration;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.*;
@@ -47,9 +46,11 @@ public class ViewDashboard extends Panel implements View {
     private Label RemouteAddr;
     public String keyc;
 
+
     public ViewDashboard() {
+
         logger  = LogManager.getLogger();
-        logger.info("!!!!!!!!!!!!!!new dashboard created!!!!!!!!!!!!!!!!!!!");
+
         addStyleName(ValoTheme.PANEL_BORDERLESS);
         setSizeFull();
         layout = new VerticalLayout();
@@ -68,11 +69,13 @@ public class ViewDashboard extends Panel implements View {
         layout.addComponent(buildInformashion());
     }
 
-    private Component buildContent() {
+
+
+    public Component buildContent() {
         dashboardPanels = new HorizontalLayout();
         dashboardPanels.addStyleName(ValoTheme.LAYOUT_HORIZONTAL_WRAPPING);
         dashboardPanels.setSpacing(true);
-        dashboardPanels.setMargin(false);
+        dashboardPanels.setMargin(true);
         dashboardPanels.setSizeFull();
         Responsive.makeResponsive(dashboardPanels);
 
@@ -97,7 +100,7 @@ public class ViewDashboard extends Panel implements View {
         return header;
     }
 
-    public Component buildInformashion() {
+    private Component buildInformashion() {
         HorizontalLayout inform = new HorizontalLayout();
         inform.setSpacing(true);
         LocalDateTime date = LocalDateTime.now();
@@ -143,7 +146,7 @@ public class ViewDashboard extends Panel implements View {
         weatherbox.addValueChangeListener((HasValue.ValueChangeEvent event) -> {
             for (String key : CityCode.keySet()) {
                 if (CityCode.get(key).equals(event.getValue())) {
-                    System.out.println(key);
+                    logger.info(key);
                     keyc = key;
                 }
             }
@@ -183,7 +186,7 @@ public class ViewDashboard extends Panel implements View {
     }
 
 
-    private Component buildCurrency() {
+    public Component buildCurrency() {
         VerticalLayout currencylayuot = new VerticalLayout();
         currencylayuot.addStyleName(ValoTheme.LAYOUT_CARD);
         currencylayuot.setWidth("100%");
@@ -207,13 +210,13 @@ public class ViewDashboard extends Panel implements View {
         return currencylayuot;
     }
 
-    private Component buildVisitation() {
+    public Component buildVisitation() {
         VerticalLayout visitationlayuot = new VerticalLayout();
         visitationlayuot.addStyleName(ValoTheme.LAYOUT_CARD);
         visitationlayuot.setWidth("100%");
         Label visitation = new Label("Посещения");
         visitation.setStyleName(ValoTheme.LABEL_H2);
-        Label quantity = new Label("Количество");
+        Label quantity = new Label("Количество" + DashboardUI.count);
         visitationlayuot.addComponents(visitation, quantity);
 
         return visitationlayuot;

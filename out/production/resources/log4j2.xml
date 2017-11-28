@@ -1,17 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="INFO">
+<Configuration status="warn">
+    <Properties>
+        <Property name="theHostName">${hostName}</Property>
+    </Properties>
+    <Properties>
+        <Property name="log-path">logs</Property>
+    </Properties>
     <Appenders>
-        <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
-        </Console>
-        <File name="MyFile" fileName="all.log" immediateFlush="false" append="false">
-            <PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        <File name="fileloggerfile" fileName="${basePath}/logs.log" immediateFlush="false" append="false">
+            <PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} ${hostName} [%t] %-5level %logger{36} - %msg%n"/>
         </File>
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout pattern="[%-5level] ${hostName} %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n"/>
+        </Console>
     </Appenders>
     <Loggers>
-        <Root level="debug">
-            <AppenderRef ref="Console" />
-            <AppenderRef ref="MyFile"/>
+        <Logger name="org.springframework.web" level="info" additivity="false">
+            <AppenderRef ref="SpringBoot-Appender"/>
+            <AppenderRef ref="Console-Appender"/>
+        </Logger>
+        <Logger name="com.example.client_vaadin" level="debug" additivity="false">
+            <appender-ref ref="fileLoggerfile" level="debug"/>
+        </Logger>
+        <Logger name="com.example.client_vaadin" level="info" additivity="false">
+            <appender-ref ref="fileLoggerfile" level="info"/>
+        </Logger>
+        <Logger name="com.example.client_vaadin" level="warm" additivity="false">
+            <appender-ref ref="fileLoggerfile" level="warm"/>
+        </Logger>
+        <Root level="debug" additivity="false">
+            <appender-ref ref="console"/>
         </Root>
     </Loggers>
 </Configuration>

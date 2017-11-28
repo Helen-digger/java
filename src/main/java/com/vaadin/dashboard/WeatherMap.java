@@ -1,4 +1,4 @@
-package com.example.client_vaadin;
+package com.vaadin.dashboard;
 
 
 import java.net.HttpURLConnection;
@@ -6,12 +6,9 @@ import java.net.URL;
 import java.net.MalformedURLException;
 import java.io.IOException;
 import java.io.*;
-import java.util.Locale;
-import java.util.Date;
-import java.text.*;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,9 +33,13 @@ public class WeatherMap {
     static final String URL_preambul_days = "http://api.openweathermap.org/data/2.5/forecast?id=";
     static final String APPID = "&APPID=79821d5373e0171e1b927d5e09e78578&units=metric";
     public Forecast weather = new Forecast();
-    static org.apache.logging.log4j.Logger logger = LogManager.getLogger();
+
+    Logger logger;
 
     public String getWeatherNow(String city_code) {
+
+        logger  = LogManager.getLogger();
+        logger.info("!!!!!!!!!!!!!!weather!!!!!!!!!!!!!!!!!");
         String forecast_json = "";
 
         try {
@@ -59,15 +60,15 @@ public class WeatherMap {
                 ParseNow(forecast_json);
 
             } else {
-                System.out.println("Error in httpURLConnection.getResponseCode()!!!");
+                logger.error("Error in httpURLConnection.getResponseCode()!!!");
             }
 
         } catch (MalformedURLException ex) {
-            logger.log(Level.ERROR, (String) null, ex);
+            logger.error(ex.getMessage(), ex);
         } catch (IOException ex) {
-            logger.log(Level.ERROR, (String) null, ex);
+            logger.error(ex.getMessage(), ex);
         } catch (JSONException ex) {
-            logger.log(Level.ERROR, (String) null, ex);
+            logger.error(ex.getMessage(), ex);
         }
         return "ERRROR!!!";
     }
@@ -93,15 +94,15 @@ public class WeatherMap {
                 ParseDay(forecast_json);
 
             } else {
-                System.out.println("Error in httpURLConnection.getResponseCode()!!!");
+                logger.error("Error in httpURLConnection.getResponseCode()!!!");
             }
 
         } catch (MalformedURLException ex) {
-            logger.log(Level.ERROR, (String) null, ex);
+            logger.error(ex.getMessage(), ex);
         } catch (IOException ex) {
-            logger.log(Level.ERROR, (String) null, ex);
+            logger.error(ex.getMessage(), ex);
         } catch (JSONException ex) {
-            logger.log(Level.ERROR, (String) null, ex);
+            logger.error(ex.getMessage(), ex);
         }
         return "ERRROR!!!";
     }
@@ -117,7 +118,7 @@ public class WeatherMap {
     }
 
     private void ParseDay(String json) throws JSONException {
-        System.out.println(json);
+        logger.info(json);
         JSONObject jsonObject = new JSONObject(json);
         int cnt = jsonObject.getInt("cnt");
         JSONArray list = jsonObject.getJSONArray("list");
@@ -133,7 +134,7 @@ public class WeatherMap {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        System.out.println(df.format(date));*/
+        logger.info(df.format(date));*/
 
         JSONObject main = list_unit.getJSONObject("main");
         weather.tomorrow.temp = main.getDouble("temp");
@@ -143,10 +144,10 @@ public class WeatherMap {
         weather.tomorrow.icon = json_weather_unit.getString("icon");
     }
 
-    public static void ShowWeather() {
+    public void ShowWeather() {
         WeatherMap map = new WeatherMap();
 
-        System.out.println("T " + map.weather.now.temp + " icon: " + map.weather.now.icon);
-        System.out.println("T " + map.weather.tomorrow.temp + " icon: " + map.weather.tomorrow.icon);
+        logger.info("T " + map.weather.now.temp + " icon: " + map.weather.now.icon);
+        logger.info("T " + map.weather.tomorrow.temp + " icon: " + map.weather.tomorrow.icon);
     }
 }

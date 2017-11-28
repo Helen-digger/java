@@ -1,5 +1,7 @@
-package com.example.client_vaadin;
+package com.vaadin.dashboard;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -9,17 +11,18 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-
 
 public class CBRDailyRu {
 
-
+    Logger logger;
     static final String URL_DailyCBR = "https://www.cbr-xml-daily.ru/daily_json.js";
 
-    static public String showrate() {
+
+
+    public String showrate() {
+
+        logger  = LogManager.getLogger();
+        logger.info("!!!!!!!!!!!!!!curenc!!!!!!!!!!!!!!!!!");
 
         String result = "";
 
@@ -44,15 +47,15 @@ public class CBRDailyRu {
                 return ParseResult(result);
 
             } else {
-                System.out.println("Error in httpURLConnection.getResponseCode()!!!");
+                logger.error("Error in httpURLConnection.getResponseCode()!!!");
             }
 
         } catch (MalformedURLException ex) {
-            Logger.getLogger(CBRDailyRu.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage(), ex);
         } catch (IOException ex) {
-            Logger.getLogger(CBRDailyRu.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage(), ex);
         } catch (JSONException ex) {
-            Logger.getLogger(CBRDailyRu.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex.getMessage(), ex);
         }
 
         return "ERRROR!!!";

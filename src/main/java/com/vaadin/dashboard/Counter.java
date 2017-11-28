@@ -1,4 +1,4 @@
-package com.example.client_vaadin;
+package com.vaadin.dashboard;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -19,6 +19,7 @@ public class Counter implements Serializable{
     public Counter(String page, String value){
         this.page = page;
         this.value = value;
+
     }
 
     @Override
