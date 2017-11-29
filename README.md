@@ -29,6 +29,7 @@ spring.data.mongodb.database=***Name_DB***
 ### Building and running demo
 at project directory:
 ```
+$ cd java/
 $ sh gradlew clean build
 $ sh gradlew bootRun
 ```
