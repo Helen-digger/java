@@ -2,7 +2,7 @@
 Dashboard informer displays weather forecast and currencies exchenge rate.
 
 ## Deployment
-$ git clone https://github.com/Helen-digger/java.git
+$ git clone https://github.com/Helen-digger/java.git --branch DashboardRel
 
 ## Getting Started
 ### Requared Packages
