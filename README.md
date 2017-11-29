@@ -32,17 +32,17 @@ at project directory:
 $ sh gradlew clean build
 $ sh gradlew bootRun
 ```
-####Demo server:
+#### Demo server:
 
 http://127.0.0.1:8087
 
-####Change server port:
+#### Change server port:
 
 at/project/directory/src/resources/application.properties
 server.port=***PORT***
 
 
-###Log file
+### Log file
 at/project/directory/logs/logs.log
 
 ## Built With
