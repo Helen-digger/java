@@ -30,7 +30,7 @@ public class DashboardUI extends UI {
 
     @Autowired
     private CounterRepository repository;
-    static String ip;
+
     static String wip;
     static String geo;
     static String count;
@@ -42,7 +42,6 @@ public class DashboardUI extends UI {
 
         addStyleName(ValoTheme.UI_WITH_MENU);
         Responsive.makeResponsive(this);
-        IpAddress(request);
 
         Counter cnt = repository.findByPage("all");
         Integer counter = new Integer(cnt.value);
@@ -60,19 +59,6 @@ public class DashboardUI extends UI {
 
         setupLayuot();
         addHeader();
-    }
-
-    private String IpAddress(VaadinRequest request){
-        ClientAddressServlet clientAddressServlet = new ClientAddressServlet();
-        try {
-            String ipAddr =  clientAddressServlet.doPost(request);
-            ip=ipAddr;
-        } catch (ServletException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return "ERRROR!!!";
     }
 
     private void setupLayuot() {

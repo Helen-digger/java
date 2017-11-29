@@ -34,7 +34,9 @@ class SelectCity {
 @SuppressWarnings("serial")
 @UIScope
 
-
+/**
+ *
+ */
 public class ViewDashboard extends Panel implements View {
 
     Logger logger;
@@ -43,9 +45,9 @@ public class ViewDashboard extends Panel implements View {
     private Label titleLabel;
     private HorizontalLayout dashboardPanels;
     private Label dollar;
-    private Label RemouteAddr;
+    private Label euro;
     public String keyc;
-
+    private Label dateLabel;
 
     public ViewDashboard() {
 
@@ -103,19 +105,20 @@ public class ViewDashboard extends Panel implements View {
     private Component buildInformashion() {
         HorizontalLayout inform = new HorizontalLayout();
         inform.setSpacing(true);
+
         LocalDateTime date = LocalDateTime.now();
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         Event event = null;
+
         String formatDateTime = date.format(formatter);
 
-        Label dateLabel = new Label(formatDateTime);
+        dateLabel = new Label(formatDateTime);
 
-
-        Panel address = new Panel("IP address:" + DashboardUI.ip);
         Panel addressw = new Panel("IP address:" + DashboardUI.wip);
         Panel geol = new Panel("IP address:" + DashboardUI.geo);
 
-        inform.addComponents( dateLabel, address, addressw, geol);
+        inform.addComponents( dateLabel, addressw, geol);
         return inform;
     }
 
@@ -127,7 +130,7 @@ public class ViewDashboard extends Panel implements View {
         weatherlayuot.setWidth("100%");
 
         Label weather = new Label("Погода");
-        WeatherMap weatherMap = new WeatherMap();
+        OpenWeatherMapForecatsAPI weatherMap = new OpenWeatherMapForecatsAPI();
 
         weather.setStyleName(ValoTheme.LABEL_H2);
         HashMap<String, String> CityCode = SelectCity.getCity();
@@ -156,32 +159,32 @@ public class ViewDashboard extends Panel implements View {
             weatherbox.getValue();
             weath.setValue(String.valueOf(weatherMap.weather.now.temp));
             image.setSource(new ExternalResource("http://openweathermap.org/img/w/" + weatherMap.weather.now.icon + ".png"));
-
+            dateLabel.setValue(String.valueOf(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
         });
 
 
         weatherlayuot.addComponent(weatherbox);
 
-        Button add = new Button("Обновить");
-        add.addStyleName(ValoTheme.BUTTON_SMALL);
-        add.setIcon(FontAwesome.REFRESH);
-        add.addClickListener(new ClickListener() {
+        Button refresh = new Button("Обновить");
+        refresh.addStyleName(ValoTheme.BUTTON_SMALL);
+        refresh.setIcon(FontAwesome.REFRESH);
+        refresh.addClickListener(new ClickListener() {
             @Override
             public void buttonClick(final ClickEvent event) {
                 weath.setValue(String.valueOf(weatherMap.weather.now.temp));
                 image.setSource(new ExternalResource("http://openweathermap.org/img/w/" + weatherMap.weather.now.icon + ".png"));
-
+                dateLabel.setValue(String.valueOf(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
             }
         });
 
 
         weatherlayuot.addComponents(weather, weatherbox, weath);
         weatherlayuot.addComponents(image);
-        weatherlayuot.addComponent(add);
+        weatherlayuot.addComponent(refresh);
 
         weatherlayuot.setComponentAlignment(weather, Alignment.MIDDLE_LEFT);
         weatherlayuot.setComponentAlignment(weatherbox, Alignment.MIDDLE_LEFT);
-        weatherlayuot.setComponentAlignment(add, Alignment.MIDDLE_LEFT);
+        weatherlayuot.setComponentAlignment(refresh, Alignment.MIDDLE_LEFT);
         return weatherlayuot;
     }
 
@@ -191,21 +194,25 @@ public class ViewDashboard extends Panel implements View {
         currencylayuot.addStyleName(ValoTheme.LAYOUT_CARD);
         currencylayuot.setWidth("100%");
         Label currency = new Label("Валюта");
-        CBRDailyRu WriteCBR = new CBRDailyRu();
+        CBRCurrencyAPI WriteCBR = new CBRCurrencyAPI();
         currency.setStyleName(ValoTheme.LABEL_H2);
-        dollar = new Label("" + WriteCBR.showrate());
+
+        dollar = new Label("USD" + WriteCBR.USD);
+        euro = new Label("EUR" + WriteCBR.EUR);
 
 
-        Button add = new Button("Обновить");
-        add.addStyleName(ValoTheme.BUTTON_SMALL);
+        Button refresh = new Button("Обновить");
+        refresh.addStyleName(ValoTheme.BUTTON_SMALL);
 
-        add.setIcon(FontAwesome.REFRESH);
-        add.addClickListener(event -> {
-            dollar.setValue(WriteCBR.showrate());
-            // date.setValue(LocalDateTime.now());
+        refresh.setIcon(FontAwesome.REFRESH);
+        refresh.addClickListener(event -> {
+            WriteCBR.GetRate();
+            dollar.setValue(String.valueOf(WriteCBR.USD));
+            euro.setValue(String.valueOf(WriteCBR.EUR));
+            dateLabel.setValue(String.valueOf(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
         });
 
-        currencylayuot.addComponents(currency, dollar, add);
+        currencylayuot.addComponents(currency, dollar, euro, refresh);
 
         return currencylayuot;
     }
