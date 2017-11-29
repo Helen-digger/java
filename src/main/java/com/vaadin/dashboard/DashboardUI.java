@@ -5,15 +5,15 @@ import com.vaadin.server.Responsive;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.DateTimeField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import javax.servlet.ServletException;
-import java.io.IOException;
 
+/**
+ * DashboardUI initializes all components
+ */
 @Title("Dashboard")
 //@Theme("dashboard")
 @SpringUI
@@ -31,13 +31,13 @@ public class DashboardUI extends UI {
     @Autowired
     private CounterRepository repository;
 
-    static String wip;
-    static String geo;
+    static String ip;
     static String count;
 
 
     @Override
     protected void init(VaadinRequest request) {
+
         logger  = LogManager.getLogger();
 
         addStyleName(ValoTheme.UI_WITH_MENU);
@@ -50,12 +50,11 @@ public class DashboardUI extends UI {
         repository.save(cnt);
         count= counter.toString();
 
-        logger.info(cnt);
+        logger.info("Total visits " + cnt);
 
-        wip = getUI().getPage().getWebBrowser().getAddress();
-        geo = getUI().getPage().getWebBrowser().getLocale().getDisplayName();
-        logger.info(wip);
-        logger.info(geo);
+        ip = getUI().getPage().getWebBrowser().getAddress();
+
+        logger.info("Client IP address" + ip);
 
         setupLayuot();
         addHeader();

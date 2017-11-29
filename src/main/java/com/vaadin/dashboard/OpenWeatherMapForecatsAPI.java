@@ -66,15 +66,21 @@ public class OpenWeatherMapForecatsAPI {
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader, 8192);
 
                 String line = null;
+
                 while ((line = bufferedReader.readLine()) != null) {
                     forecastJson += line;
                 }
                 bufferedReader.close();
 
+                if (forecastJson.length() == 0) {
+                    return "Server response empty";
+                }
+
                 ParseNow(forecastJson);
 
             } else {
                 logger.error("Error in httpURLConnection.getResponseCode()!!!");
+                return "httpURLConnection.getResponseCode failed";
             }
 
         } catch (MalformedURLException ex) {
@@ -84,7 +90,7 @@ public class OpenWeatherMapForecatsAPI {
         } catch (JSONException ex) {
             logger.error(ex.getMessage(), ex);
         }
-        return "ERRROR!!!";
+        return null;
     }
 
     /**
@@ -92,13 +98,13 @@ public class OpenWeatherMapForecatsAPI {
      * @param cityCode - city identifier from list of city ID
      * @return
      */
-    private String getWeatherTomorrow(String cityCode) {
+    public String getWeatherTomorrow(String cityCode) {
         logger  = LogManager.getLogger();
         logger.info("Request " + URLPreambulNow + cityCode + APPID);
         String forecastJson = "";
 
         try {
-            URL url_weather = new URL(URLPreambulDays +cityCode+APPID);
+            URL url_weather = new URL(URLPreambulDays + cityCode + APPID);
 
             HttpURLConnection httpURLConnection = (HttpURLConnection) url_weather.openConnection();
 
@@ -107,15 +113,21 @@ public class OpenWeatherMapForecatsAPI {
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader, 8192);
 
                 String line = null;
-                while ((line = bufferedReader.readLine()) != null) {
-                    forecastJson += line;
-                }
-                bufferedReader.close();
 
-                ParseTomorrow(forecastJson);
+                    while ((line = bufferedReader.readLine()) != null) {
+                        forecastJson += line;
+                    }
+                    bufferedReader.close();
+
+                    ParseTomorrow(forecastJson);
+                if (forecastJson.length() == 0) {
+                    return "Server response empty";
+                }
+
 
             } else {
                 logger.error("Error in httpURLConnection.getResponseCode()!!!");
+                return "httpURLConnection.getResponseCode failed";
             }
 
         } catch (MalformedURLException ex) {
@@ -125,7 +137,7 @@ public class OpenWeatherMapForecatsAPI {
         } catch (JSONException ex) {
             logger.error(ex.getMessage(), ex);
         }
-        return "ERRROR!!!";
+        return null;
     }
 
     /**

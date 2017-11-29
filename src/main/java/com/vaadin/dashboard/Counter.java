@@ -8,7 +8,7 @@ import java.io.Serializable;
 @Document(collection = Counter.COLLECTION_NAME)
 
 /**
- *
+ *Counter counts the number of visits to the site
  */
 public class Counter implements Serializable{
 
@@ -37,9 +37,7 @@ public class Counter implements Serializable{
      */
     @Override
     public String toString() {
-        return String.format(
-                "Counter[id=%s, page='%s', value='%s']",
-                id, page, value);
+        return String.format("Counter[id=%s, page='%s', value='%s']", id, page, value);
     }
 
 }

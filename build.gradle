@@ -42,15 +42,11 @@ idea {
 	}
 }
 
-
 configurations {
 	all {
 		exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
 	}
 }
-
-//bootRun.dependsOn 'vaadinCompile', 'vaadinThemeCompile'
-
 
 dependencyManagement {
 	imports {
@@ -84,17 +80,14 @@ dependencies {
 	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.9.1'
 	compile "org.slf4j:slf4j-simple:1.7.9"
 
-	compile "com.vaadin:vaadin-theme-compiler:7.0.1"
-	compile "com.vaadin:vaadin-themes:8.0.1"
-
 	runtime 'org.hsqldb:hsqldb'
 
 	testCompile 'org.springframework.boot:spring-boot-starter-test'
 	testCompile("org.springframework:spring-test")
 	testCompile("com.jayway.jsonpath:json-path")
 	testCompile("com.jayway.jsonpath:json-path-assert")
-
 }
+
 task wrapper(type: Wrapper) {
 	gradleVersion = '4.2.1'
 }

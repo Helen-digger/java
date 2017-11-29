@@ -11,13 +11,16 @@ import com.vaadin.ui.themes.ValoTheme;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static com.vaadin.ui.Button.*;
 
-
+/**
+ *SelectCity contains a list of cities and their corresponding codes
+ */
 class SelectCity {
     private static final HashMap<String, String> citycode = new HashMap<>();
 
@@ -25,29 +28,81 @@ class SelectCity {
         citycode.put("524901", "Москва");
         citycode.put("498817", "Санкт - Петербург");
         citycode.put("1496747", "Новосибирск");
+        citycode.put("0000000", "Error URL");
 
         return citycode;
     }
 }
 
+
+/**
+ *  WeatherPannel contains components for displaying and updating the weather forecast
+ */
+final class WeatherPannel {
+    Label TempNow;
+    Label TempTomorrow;
+    Image ImgNow;
+    Image ImgTomorrow;
+    OpenWeatherMapForecatsAPI weatherMap;
+
+    WeatherPannel() {
+        TempNow = new Label();
+        TempTomorrow = new Label();
+        ImgNow = new Image();
+        ImgTomorrow = new Image();
+        weatherMap = new OpenWeatherMapForecatsAPI();
+    }
+
+    /**
+     * Update request weather forecast and fills in the appropriate fields
+     * @param keyc - city code to request a weather forecast
+     */
+    void Update(String keyc) {
+        weatherMap.getWeatherNow(keyc);
+        weatherMap.getWeatherTomorrow(keyc);
+        String WeatherErrorNow = weatherMap.getWeatherNow(keyc);
+        String WeatherErrorTomorrow = weatherMap.getWeatherTomorrow(keyc);
+        String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
+        if (WeatherErrorNow != null)
+        {
+            TempNow.setValue(WeatherErrorNow);
+            ImgNow.setSource( new FileResource(new File(basepath + "/Pic/1304.gif")));
+        }
+        else {
+            TempNow.setValue("Температура текущая: " + (weatherMap.weather.now.temp.intValue()) + "°C");
+            ImgNow.setSource(new ExternalResource("http://openweathermap.org/img/w/" + weatherMap.weather.now.icon + ".png"));
+        }
+        if (WeatherErrorTomorrow != null)
+        {
+            TempTomorrow.setValue(WeatherErrorTomorrow);
+            ImgTomorrow.setSource( new FileResource(new File(basepath + "/Pic/1304.gif")));
+        }
+        else {
+            TempTomorrow.setValue("Температура на завтра: " + (weatherMap.weather.tomorrow.temp.intValue()) + "°C");
+            ImgTomorrow.setSource(new ExternalResource("http://openweathermap.org/img/w/" + weatherMap.weather.tomorrow.icon + ".png"));
+
+        }
+    }
+}
+
+
 @SpringComponent
 @SuppressWarnings("serial")
 @UIScope
-
 /**
- *
+ * ViewDashboard displays the weather forecast, currency rate, number of visits, server time and client IP address of the client,
+ * allows you to update the content separately, at the click of a button
  */
 public class ViewDashboard extends Panel implements View {
 
     Logger logger;
 
-    private final VerticalLayout layout;
+    private final VerticalLayout layoutSkeleton;
     private Label titleLabel;
-    private HorizontalLayout dashboardPanels;
-    private Label dollar;
-    private Label euro;
+    private HorizontalLayout MainPanels;
     public String keyc;
     private Label dateLabel;
+    private WeatherPannel weatherPannel;
 
     public ViewDashboard() {
 
@@ -55,45 +110,46 @@ public class ViewDashboard extends Panel implements View {
 
         addStyleName(ValoTheme.PANEL_BORDERLESS);
         setSizeFull();
-        layout = new VerticalLayout();
-        layout.setSizeFull();
-        layout.setSpacing(true);
-        setContent(layout);
-        Responsive.makeResponsive(layout);
-        layout.addComponent(buildHeader());
+        layoutSkeleton = new VerticalLayout();
+        layoutSkeleton.setSizeFull();
+        layoutSkeleton.setSpacing(true);
+        setContent(layoutSkeleton);
+        Responsive.makeResponsive(layoutSkeleton);
+        layoutSkeleton.addComponent(buildHeader());
+        Component content = placePanels();
+        layoutSkeleton.addComponent(content);
+        layoutSkeleton.setExpandRatio(content, 1);
+        layoutSkeleton.addComponent(buildDateandIP());
+    }
 
-        Component content = buildContent();
+    /**
+     * placePanels places information panels inside MainPanels
+     * @return
+     */
+    public Component placePanels() {
+        MainPanels = new HorizontalLayout();
+        MainPanels.addStyleName(ValoTheme.LAYOUT_HORIZONTAL_WRAPPING);
+        MainPanels.setSpacing(true);
+        MainPanels.setMargin(true);
+        MainPanels.setSizeFull();
+        Responsive.makeResponsive(MainPanels);
 
+        MainPanels.addComponent(buildWeather());
+        MainPanels.addComponent(buildCurrency());
+        MainPanels.addComponent(buildVisits());
 
-        layout.addComponent(content);
-        layout.setExpandRatio(content, 1);
-
-        layout.addComponent(buildInformashion());
+        return MainPanels;
     }
 
 
-
-    public Component buildContent() {
-        dashboardPanels = new HorizontalLayout();
-        dashboardPanels.addStyleName(ValoTheme.LAYOUT_HORIZONTAL_WRAPPING);
-        dashboardPanels.setSpacing(true);
-        dashboardPanels.setMargin(true);
-        dashboardPanels.setSizeFull();
-        Responsive.makeResponsive(dashboardPanels);
-
-        dashboardPanels.addComponent(buildweather());
-        dashboardPanels.addComponent(buildCurrency());
-        dashboardPanels.addComponent(buildVisitation());
-
-        return dashboardPanels;
-    }
-
-
+    /**
+     * buildHeader displays the head of the Dashboard
+     * @return
+     */
     private Component buildHeader() {
         HorizontalLayout header = new HorizontalLayout();
         header.setSpacing(true);
         header.setMargin(true);
-
         titleLabel = new Label("Dashboard");
         titleLabel.setSizeUndefined();
         titleLabel.addStyleName(ValoTheme.LABEL_H1);
@@ -102,48 +158,58 @@ public class ViewDashboard extends Panel implements View {
         return header;
     }
 
-    private Component buildInformashion() {
-        HorizontalLayout inform = new HorizontalLayout();
-        inform.setSpacing(true);
+    /**
+     * buildDateandIP displays the server time and IP address of the client
+     * @return
+     */
+    private Component buildDateandIP() {
+
+        HorizontalLayout bottomLayout = new HorizontalLayout();
 
         LocalDateTime date = LocalDateTime.now();
-
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        Event event = null;
-
         String formatDateTime = date.format(formatter);
+        dateLabel = new Label("Информация по состоянию на " + formatDateTime);
 
-        dateLabel = new Label(formatDateTime);
+        Label clientIP = new Label("Ваш IPaddress: " + DashboardUI.ip);
 
-        Panel addressw = new Panel("IP address:" + DashboardUI.wip);
-        Panel geol = new Panel("IP address:" + DashboardUI.geo);
+        bottomLayout.addComponents( dateLabel, clientIP);
+        bottomLayout.setComponentAlignment(dateLabel, Alignment.BOTTOM_LEFT);
+        bottomLayout.setComponentAlignment(clientIP, Alignment.BOTTOM_RIGHT);
+        bottomLayout.setSpacing(true);
+        bottomLayout.setWidth("100%");
 
-        inform.addComponents( dateLabel, addressw, geol);
-        return inform;
+        return bottomLayout;
     }
 
 
-    public Component buildweather() {
+    /**
+     * buildWeather displays the weather forecast for the current time and for tomorrow, allows you to select a city from the list and update the weather forecast
+     * @return
+     */
+    public Component buildWeather() {
 
-        VerticalLayout weatherlayuot = new VerticalLayout();
-        weatherlayuot.addStyleName(ValoTheme.LAYOUT_CARD);
-        weatherlayuot.setWidth("100%");
+        VerticalLayout weatherLayuot = new VerticalLayout();
+        VerticalLayout layoutForecast = new VerticalLayout();
+        HorizontalLayout layoutWeatherNow = new HorizontalLayout();
+        HorizontalLayout layoutWeatherTomorrow = new HorizontalLayout();
+        weatherLayuot.addStyleName(ValoTheme.LAYOUT_CARD);
+        weatherLayuot.setWidth("100%");
+        weatherLayuot.setHeight("100%");
+
+        weatherPannel = new WeatherPannel();
 
         Label weather = new Label("Погода");
-        OpenWeatherMapForecatsAPI weatherMap = new OpenWeatherMapForecatsAPI();
-
         weather.setStyleName(ValoTheme.LABEL_H2);
-        HashMap<String, String> CityCode = SelectCity.getCity();
-        Image image = new Image();
+
         ComboBox weatherbox = new ComboBox();
 
+        HashMap<String, String> CityCode = SelectCity.getCity();
         List<Object> list = new ArrayList<>();
         for (Map.Entry<String, String> e : CityCode.entrySet()) {
             list.add(e.getValue());
         }
         weatherbox.setItems(list);
-
-        Label weath = new Label();
         weatherbox.setPlaceholder("No city selected");
         weatherbox.setEmptySelectionAllowed(false);
         weatherbox.addValueChangeListener((HasValue.ValueChangeEvent event) -> {
@@ -153,17 +219,10 @@ public class ViewDashboard extends Panel implements View {
                     keyc = key;
                 }
             }
-            Notification.show("" + weatherMap.getWeatherNow(keyc),
-                    String.valueOf(event.getValue()),
-                    Notification.Type.TRAY_NOTIFICATION);
-            weatherbox.getValue();
-            weath.setValue(String.valueOf(weatherMap.weather.now.temp));
-            image.setSource(new ExternalResource("http://openweathermap.org/img/w/" + weatherMap.weather.now.icon + ".png"));
-            dateLabel.setValue(String.valueOf(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
+            logger.info("ComboBox: city select " +  "\"" + weatherbox.getValue() +  "\"");
+            weatherPannel.Update(keyc);
+            dateLabel.setValue("Информация по состоянию на " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         });
-
-
-        weatherlayuot.addComponent(weatherbox);
 
         Button refresh = new Button("Обновить");
         refresh.addStyleName(ValoTheme.BUTTON_SMALL);
@@ -171,68 +230,127 @@ public class ViewDashboard extends Panel implements View {
         refresh.addClickListener(new ClickListener() {
             @Override
             public void buttonClick(final ClickEvent event) {
-                weath.setValue(String.valueOf(weatherMap.weather.now.temp));
-                image.setSource(new ExternalResource("http://openweathermap.org/img/w/" + weatherMap.weather.now.icon + ".png"));
-                dateLabel.setValue(String.valueOf(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
+                logger.info("Button click: update weather forecast");
+                weatherPannel.Update(keyc);
+                dateLabel.setValue("Информация по состоянию на " + (LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
             }
         });
 
+        layoutWeatherNow.addComponents(weatherPannel.TempNow, weatherPannel.ImgNow);
+        layoutWeatherNow.setComponentAlignment(weatherPannel.TempNow, Alignment.MIDDLE_LEFT);
+        layoutWeatherNow.setComponentAlignment(weatherPannel.ImgNow, Alignment.MIDDLE_LEFT);
+        layoutWeatherTomorrow.addComponents(weatherPannel.TempTomorrow, weatherPannel.ImgTomorrow);
+        layoutWeatherTomorrow.setComponentAlignment(weatherPannel.TempTomorrow, Alignment.MIDDLE_LEFT);
+        layoutWeatherTomorrow.setComponentAlignment(weatherPannel.ImgTomorrow, Alignment.MIDDLE_LEFT);
 
-        weatherlayuot.addComponents(weather, weatherbox, weath);
-        weatherlayuot.addComponents(image);
-        weatherlayuot.addComponent(refresh);
+        layoutForecast.setSpacing(false);
+        layoutForecast.setMargin(false);
+        layoutForecast.addComponents(layoutWeatherNow);
+        layoutForecast.addComponent(layoutWeatherTomorrow);
 
-        weatherlayuot.setComponentAlignment(weather, Alignment.MIDDLE_LEFT);
-        weatherlayuot.setComponentAlignment(weatherbox, Alignment.MIDDLE_LEFT);
-        weatherlayuot.setComponentAlignment(refresh, Alignment.MIDDLE_LEFT);
-        return weatherlayuot;
+        weatherLayuot.addComponents(weather, weatherbox);
+        weatherLayuot.addComponent(layoutForecast);
+        weatherLayuot.addComponent(refresh);
+        weatherLayuot.setComponentAlignment(weather, Alignment.TOP_CENTER);
+        weatherLayuot.setComponentAlignment(weatherbox, Alignment.MIDDLE_LEFT);
+        weatherLayuot.setComponentAlignment(refresh, Alignment.BOTTOM_LEFT);
+
+        return weatherLayuot;
     }
 
 
+    /**
+     *  buildCurrency displays the exchange rates of the dollar and euro and update the data
+     * @return
+     */
     public Component buildCurrency() {
-        VerticalLayout currencylayuot = new VerticalLayout();
-        currencylayuot.addStyleName(ValoTheme.LAYOUT_CARD);
-        currencylayuot.setWidth("100%");
-        Label currency = new Label("Валюта");
-        CBRCurrencyAPI WriteCBR = new CBRCurrencyAPI();
+        VerticalLayout currencyLayuot = new VerticalLayout();
+        VerticalLayout layoutExchangeRates = new VerticalLayout();
+        HorizontalLayout layoutUSD = new HorizontalLayout();
+        HorizontalLayout layoutEUR = new HorizontalLayout();
+        currencyLayuot.addStyleName(ValoTheme.LAYOUT_CARD);
+        currencyLayuot.setWidth("100%");
+        currencyLayuot.setHeight("100%");
+
+        Label currency = new Label("Курсы валют");
         currency.setStyleName(ValoTheme.LABEL_H2);
 
-        dollar = new Label("USD" + WriteCBR.USD);
-        euro = new Label("EUR" + WriteCBR.EUR);
+        CBRCurrencyAPI WriteCBR = new CBRCurrencyAPI();
 
+        WriteCBR.GetRate();
+        String basepath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
+        Image usdImg = new Image();
+        Image eurImg = new Image();
+        String CurrencyErorr = WriteCBR.GetRate();
+        Label dollar = new Label();
+        Label euro = new Label();
+        if (CurrencyErorr != null)
+        {
+            dollar.setValue(CurrencyErorr);
+            euro.setValue(CurrencyErorr);
+        } else {
+            dollar.setValue("" + WriteCBR.USD);
+            usdImg.setSource(new FileResource(new File(basepath + "/Pic/dollar.png")));
+            euro.setValue("" + WriteCBR.EUR);
+            eurImg.setSource(new FileResource(new File(basepath + "/Pic/euro.png")));
+        }
 
         Button refresh = new Button("Обновить");
         refresh.addStyleName(ValoTheme.BUTTON_SMALL);
 
         refresh.setIcon(FontAwesome.REFRESH);
         refresh.addClickListener(event -> {
+            logger.info("Button click: update exchange rates");
             WriteCBR.GetRate();
             dollar.setValue(String.valueOf(WriteCBR.USD));
             euro.setValue(String.valueOf(WriteCBR.EUR));
-            dateLabel.setValue(String.valueOf(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
+            dateLabel.setValue("Информация по состоянию на " + (LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
         });
 
-        currencylayuot.addComponents(currency, dollar, euro, refresh);
+        layoutUSD.addComponents(usdImg, dollar);
+        layoutUSD.setComponentAlignment(usdImg, Alignment.MIDDLE_LEFT);
+        layoutUSD.setComponentAlignment(dollar, Alignment.MIDDLE_LEFT);
+        layoutEUR.addComponents(eurImg, euro);
+        layoutEUR.setComponentAlignment(eurImg, Alignment.MIDDLE_LEFT);
+        layoutEUR.setComponentAlignment(euro, Alignment.MIDDLE_LEFT);
 
-        return currencylayuot;
+        layoutExchangeRates.addComponents(layoutUSD, layoutEUR);
+        layoutExchangeRates.setSpacing(false);
+        layoutExchangeRates.setMargin(false);
+
+        currencyLayuot.addComponents(currency, layoutExchangeRates, refresh);
+        currencyLayuot.setComponentAlignment(currency, Alignment.TOP_CENTER);
+        currencyLayuot.setComponentAlignment(refresh, Alignment.BOTTOM_LEFT);
+
+        return currencyLayuot;
     }
 
-    public Component buildVisitation() {
-        VerticalLayout visitationlayuot = new VerticalLayout();
-        visitationlayuot.addStyleName(ValoTheme.LAYOUT_CARD);
-        visitationlayuot.setWidth("100%");
-        Label visitation = new Label("Посещения");
-        visitation.setStyleName(ValoTheme.LABEL_H2);
-        Label quantity = new Label("Количество" + DashboardUI.count);
-        visitationlayuot.addComponents(visitation, quantity);
+    /**
+     *  buildVisits displays the number of visits to the site
+     * @return
+     */
+    public Component buildVisits() {
+        VerticalLayout visitsLayout = new VerticalLayout();
+        visitsLayout.addStyleName(ValoTheme.LAYOUT_CARD);
+        visitsLayout.setWidth("100%");
+        visitsLayout.setHeight("100%");
 
-        return visitationlayuot;
+        Label visitsHeader = new Label("Счетчик посещений");
+        visitsHeader.setStyleName(ValoTheme.LABEL_H2);
+
+        Label quantity = new Label("" + DashboardUI.count);
+        quantity.addStyleName(ValoTheme.LABEL_H1);
+
+        visitsLayout.addComponents(visitsHeader, quantity);
+        visitsLayout.setComponentAlignment(visitsHeader, Alignment.TOP_CENTER);
+        visitsLayout.setComponentAlignment(quantity, Alignment.TOP_CENTER);
+
+        return visitsLayout;
     }
-
 
     @Override
     public void enter(final ViewChangeListener.ViewChangeEvent event) {
-        layout.addComponent(new Label());
+        layoutSkeleton.addComponent(new Label());
     }
 
 }

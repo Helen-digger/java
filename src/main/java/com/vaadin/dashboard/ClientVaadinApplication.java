@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class ClientVaadinApplication {
-	private static final Logger logger = LogManager.getLogger();
+	private static Logger logger = LogManager.getLogger();
 
 	public static void main(String[] args)  {
 		SpringApplication.run(ClientVaadinApplication.class, args);

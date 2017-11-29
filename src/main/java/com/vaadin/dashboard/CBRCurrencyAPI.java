@@ -27,7 +27,7 @@ public class CBRCurrencyAPI {
     /**
      * Get JSON data about currency exchange rates and call parser
      */
-    public void GetRate() {
+    public String GetRate() {
 
         logger  = LogManager.getLogger();
         logger.info("Request " + URLDailyCBR);
@@ -49,10 +49,19 @@ public class CBRCurrencyAPI {
                 }
 
                 bufferedReader.close();
-                ParseResult(result);
+
+                if (result.length() == 0) {
+                    return "Server response empty";
+                }
+
+                String parseError = ParseResult(result);
+                if (parseError != null) {
+                    return "Server response invalid";
+                }
 
             } else {
                 logger.error("Error in httpURLConnection.getResponseCode()!!!");
+                return "httpURLConnection.getResponseCode failed";
             }
 
         } catch (MalformedURLException ex) {
@@ -62,6 +71,7 @@ public class CBRCurrencyAPI {
         } catch (JSONException ex) {
             logger.error(ex.getMessage(), ex);
         }
+        return null;
     }
 
     /**
@@ -69,7 +79,7 @@ public class CBRCurrencyAPI {
      * @param json - data received from https://www.cbr-xml-daily.ru/daily_json.js
      * @throws JSONException
      */
-    private void ParseResult(String json) throws JSONException {
+    private String ParseResult(String json) throws JSONException {
 
         try {
             JSONObject jsonObject = new JSONObject(json);
@@ -83,7 +93,9 @@ public class CBRCurrencyAPI {
             EUR = JSONObjectEUR.getDouble("Value");
         }catch (JSONException ex) {
             logger.error(ex.getMessage(), ex);
+            return "Parse blablabla failed";
         }
+        return null;
     }
 
 }

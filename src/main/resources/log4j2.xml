@@ -19,14 +19,8 @@
             <AppenderRef ref="SpringBoot-Appender"/>
             <AppenderRef ref="Console-Appender"/>
         </Logger>
-        <Logger name="com.example.client_vaadin" level="debug" additivity="false">
+        <Logger name="com.vaadin.dashboard" level="debug" additivity="false">
             <appender-ref ref="fileLoggerfile" level="debug"/>
-        </Logger>
-        <Logger name="com.example.client_vaadin" level="info" additivity="false">
-            <appender-ref ref="fileLoggerfile" level="info"/>
-        </Logger>
-        <Logger name="com.example.client_vaadin" level="warm" additivity="false">
-            <appender-ref ref="fileLoggerfile" level="warm"/>
         </Logger>
         <Root level="debug" additivity="false">
             <appender-ref ref="console"/>
