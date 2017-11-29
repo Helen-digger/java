@@ -7,24 +7,9 @@ $ git clone https://github.com/Helen-digger/java.git --branch DashboardRel
 ## Getting Started
 ### Requared Packages
 
-install Java 8 https://www.digitalocean.com/community/tutorials/java-apt-get-ubuntu-16-04-ru
-gradle (version 4+) https://gradle.org/install/
-mongodb https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
-
-### Building and running demo
-at project directory:
-```
-$ sh gradlew clean build
-$ sh gradlew bootRun
-```
-####Demo server:
-
-http://127.0.0.1:8087
-
-####Change server port:
-
-at/project/directory/src/resources/application.properties
-server.port=***PORT***
+	install Java 8 https://www.digitalocean.com/community/tutorials/java-apt-get-ubuntu-16-04-ru
+	gradle (version 4+) https://gradle.org/install/
+	mongodb https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
 
 #### Prepare mongoDB
 
@@ -40,6 +25,21 @@ spring.data.mongodb.host=***HostName***
 spring.data.mongodb.port=***PORTDB***
 spring.data.mongodb.database=***Name_DB*** 
 ```
+
+### Building and running demo
+at project directory:
+```
+$ sh gradlew clean build
+$ sh gradlew bootRun
+```
+####Demo server:
+
+http://127.0.0.1:8087
+
+####Change server port:
+
+at/project/directory/src/resources/application.properties
+server.port=***PORT***
 
 
 ###Log file
